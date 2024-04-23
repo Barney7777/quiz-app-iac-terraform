@@ -1,0 +1,78 @@
+name: React Infra Pipeline
+
+on: 
+  push:
+    branches:
+      - main
+    paths:
+      - iac-code/**
+  pull_request:
+    branches:
+      - main
+    paths:
+      - iac-code/**
+
+env:
+  # Credentials for deployment to AWS
+    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    AWS_REGION: ap-southeast-2
+
+jobs:
+  terraform:
+    name: "Apply terraform code changes"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./backend-iac
+    
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+    
+    # - name: Terraform security scan
+    #   uses: aquasecurity/tfsec-actions@v1.0.0
+    #   with: 
+    #     working_directory: ./iac-code
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v3
+    
+    - name: Terraform Init
+      id: init
+      run: terraform init
+    
+    - name: Terraform Format
+      id: fmt
+      run: terraform fmt -check
+      continue-on-error: true
+  
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate
+    
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -no-color -input=false -out planfile
+      continue-on-error: true
+    
+    - name: Terraform Plan Status
+      if: steps.plan.outcome == 'failure'
+      run: exit 1
+    
+    - name: Terraform Apply
+      id: apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform destroy -auto-approve
+    
+    - name: Send a Slack Notification
+      if: always()
+      uses: act10ns/slack@v1
+      with:
+        status: ${{ job.status }}
+        steps: ${{ toJson(steps) }}
+        channel: 'react-app'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
