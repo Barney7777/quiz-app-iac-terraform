@@ -5,12 +5,12 @@ on:
     branches:
       - main
     paths:
-      - ./backend-iac/**
+      - backend-iac/**
   pull_request:
     branches:
       - main
     paths:
-      - ./backend-iac/**
+      - backend-iac/**
 
 env:
   # Credentials for deployment to AWS
