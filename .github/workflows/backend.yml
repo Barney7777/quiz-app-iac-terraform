@@ -67,12 +67,12 @@ jobs:
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false -parallelism=1 planfile
     
-    - name: Send a Slack Notification
-      if: always()
-      uses: act10ns/slack@v1
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      with:
-        status: ${{ job.status }}
-        steps: ${{ toJson(steps) }}
-        channel: 'quiz-app'
+    # - name: Send a Slack Notification
+    #   if: always()
+    #   uses: act10ns/slack@v1
+    #   env:
+    #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    #   with:
+    #     status: ${{ job.status }}
+    #     steps: ${{ toJson(steps) }}
+    #     channel: 'quiz-app'
