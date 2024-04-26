@@ -53,8 +53,8 @@ variable "record_name" {
 
 # ACM variables
 variable "subdomain_name" {
-  description = "subdomain to point to alb dns"
-
+  description = "sub domain for backend alb"
+  type = string
 }
 
 # ecs variables
