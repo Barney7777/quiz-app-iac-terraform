@@ -54,7 +54,7 @@ variable "record_name" {
 # ACM variables
 variable "subdomain_name" {
   description = "sub domain for backend alb"
-  type = string
+  type        = string
 }
 
 # ecs variables
