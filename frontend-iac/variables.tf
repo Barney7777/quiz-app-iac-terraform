@@ -38,4 +38,3 @@ variable "record_name" {
 
 
 
-
