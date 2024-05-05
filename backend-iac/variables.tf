@@ -67,3 +67,4 @@ variable "container_image" {
   description = "container image ami"
   type        = string
 }
+
